@@ -44,6 +44,9 @@
 //	a scroll view along with a text view. The code was incomplete and not entirely
 //	functional. A number of modifications were made to produce this working product.
 
+//	You can put anything you want in the header view: images, text and token fields,
+//	whatever, and they will all show up above the main text view.
+
 #import <Cocoa/Cocoa.h>
 
 

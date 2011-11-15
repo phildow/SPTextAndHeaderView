@@ -62,74 +62,80 @@
 
 - (void) prepareTextAndHeaderView
 {
-	
-	const CGFloat CHLargeNumberForText = 1.0e7;
-	const CGFloat kExtendedNoteTextContainerInset = 46.0;
-	[self.textView setTextContainerInset:NSMakeSize(kExtendedNoteTextContainerInset,5.0)];
-	
-	/*
-	[self.textView setPostsFrameChangedNotifications:YES];
-	
-	[[NSNotificationCenter defaultCenter] addObserver:self 
-			selector:@selector(viewFrameDidChange:) 
-			name:NSViewFrameDidChangeNotification 
-			object:[self view]];
-	*/
+	// SPTextAndHeaderViewContainer manages the geometry of the enclossing scroll view
+	// when the text view changes due to user interaction (typing, resizing, etc),
+	// but the setup and view hiearchy must be established here.
 	
 	
-	NSTextContainer *oContainer = [self.textView textContainer];
-	NSTextContainer *textContainer = [[[NSTextContainer alloc] initWithContainerSize:
-			NSMakeSize(CHLargeNumberForText, CHLargeNumberForText)] autorelease];
+	// Add a margin to the text view; the vertical should correspond to the contents
+	// of the header view
 	
+	const CGFloat kVerticalContainerInset = 5.0; // left and right indentation
+	const CGFloat kHorizontalContainerInset = 46.0; // top and bottom indentation
+	const CGFloat kVerticalTextPadding = 15.0; // padding between header and text view
 	
-	NSRect headerClip = NSMakeRect(0, 25, NSWidth([self.textView bounds]), 110);
-	//[textContainer setClippingRect:headerClip forKey:[NSNumber numberWithInteger:1]];
+	[self.textView setTextContainerInset:NSMakeSize(kHorizontalContainerInset,
+			kVerticalContainerInset)];
 	
+	// Set up view geometry and heierarchy. The text view initially occupies the entire 
+	// scroll view as its document view. We will be replacing the text view with our custom 
+	// text-and-container view, which becomes the scroll's document view. The text view
+	// and header view are then added to the container view as its subviews:
 	
-	[textContainer setHeightTracksTextView:NO];
-	[textContainer setWidthTracksTextView:YES];
-	
-	[textContainer setLineFragmentPadding:[oContainer lineFragmentPadding]];
-	[textContainer setContainerSize:[oContainer containerSize]];
-	
-	[self.textView replaceTextContainer:textContainer];
-	
-	
-	[self.headerView setFrame:headerClip];
-	//[self.textView addSubview:self.headerView];
+	// Scroll View -> Document View / SPTextAndHeaderView
+	//	
+	//		[											]
+	//		[ header view								]
+	//		[											]
+	//		[ text view									]
+	//		[											]
+	//
 	
 	NSRect containerFrame = [self.textView frame];
+	NSRect headerFrame = [self.headerView frame];
+	NSRect textFrame = [self.textView frame];
+	
+	// adjust header frame for new location in containing view
+	headerFrame = NSMakeRect(0, 0, NSWidth(textFrame), NSHeight(headerFrame));
+	
+	// adjust text view frame for new location in containing view
+	textFrame.origin.y = NSHeight(headerFrame) + kVerticalTextPadding;
+	textFrame.size.height = headerFrame.origin.y;
+	
 	SPTextAndHeaderViewContainer *container = [[SPTextAndHeaderViewContainer alloc] 
 			initWithFrame:containerFrame];
 	
 	[container setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
 	
+	// grab the scroll view before removing the text view
 	NSScrollView *scrollView = [textView enclosingScrollView];
 	
-	[textView retain];
+	[textView retain]; // retain before removing from superview
 	[textView removeFromSuperview];
 	
-	headerClip.origin.y = 0;
-	[headerView setFrame:headerClip];
-	[container addSubview:headerView];
+	// set frames and add text and header views to containing views
 	
-	NSRect textFrame = [textView frame];
-	textFrame.size.height = headerClip.origin.y;
-	textFrame.origin.y = 125;
 	[textView setFrame:textFrame];
 	[container addSubview:textView];
+	
+	[headerView setFrame:headerFrame];
+	[container addSubview:headerView];
 	
 	container.scrollViewAncestor = scrollView;
 	container.textView = textView;
 	
 	// container.headerView = headerView;
-	// This call screws everything up!
+	// This call screws it up, unneeded by the container view anyway
 	
-	//[container setFrame:containerFrame];
 	[scrollView setDocumentView:container];
 	
+	// set up is complete, just adding the scroll view to the window's content view
 	[scrollView setFrame:[[self.window contentView] bounds]];
 	[[self.window contentView] addSubview:scrollView];
+	
+	// release after returning to new superview
+	[container release];
+	[textView release];
 }
 
 @end

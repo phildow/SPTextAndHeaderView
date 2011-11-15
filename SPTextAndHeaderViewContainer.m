@@ -51,10 +51,12 @@
 //	and on the text view...
 //	
 //	The header should be horizontally resizable, be sticky on the left 
-//	and right sides, and be sticky on the bottom
+//	and right sides, and be sticky on the bottom.
 //
 //	The text view should be horizontally resizable and sticky on 
-//	the left and right sides as well as on the top
+//	the left and right sides as well as on the top.
+//
+//	This has been established in IB but could be accomplished in code as well.
 //
 
 #import "SPTextAndHeaderViewContainer.h"
@@ -99,11 +101,8 @@
 - (void)resizeSubviewsWithOldSize:(NSSize)oldBoundsSize { //(PHIL)
 	
 	// set and check autosizing flag to prevent infinite recursive loop
-	
 	if ( isAutosizing ) return;
 	isAutosizing = YES;
-	
-	//DLog();
 	
 	// resize 
 	[super resizeSubviewsWithOldSize:oldBoundsSize]; 
@@ -144,8 +143,6 @@
 	myFrame.size.height = desiredHeight;
 	myFrame.origin.y = 0;
 	
-	//DLog(@"text frame: %@, container frame: %@", NSStringFromRect(textFrame), NSStringFromRect(myFrame) );
-	
 	[self setFrame:myFrame];
 }
 
@@ -178,7 +175,5 @@
 	}
 	[super dealloc]; 
 }
-
-#pragma mark -
 
 @end
