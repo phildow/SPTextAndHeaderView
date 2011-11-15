@@ -56,6 +56,13 @@
 
 #import "SPTextAndHeaderViewContainer.h"
 
+@interface SPTextAndHeaderViewContainer()
+
+- (void) embeddedTextViewFrameDidChange:(NSNotification* )aNotification;
+
+@end
+
+#pragma mark -
 
 @implementation SPTextAndHeaderViewContainer
 
@@ -117,8 +124,8 @@
 	
 	// Do not recall why the 20 and 10 offsets.
 	
-	CGFloat minHeight = [scrollViewAncestor contentSize].height - 20; // margin
-	CGFloat desiredHeight = NSMaxY(textFrame) + 10; // margin
+	CGFloat minHeight = [scrollViewAncestor contentSize].height;// - 20; // margin
+	CGFloat desiredHeight = NSMaxY(textFrame);// + 10; // margin
 	
 	if ( desiredHeight < minHeight ) desiredHeight = minHeight;
 	

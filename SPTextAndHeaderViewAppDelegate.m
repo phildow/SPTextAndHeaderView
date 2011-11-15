@@ -100,7 +100,7 @@
 	
 	// adjust text view frame for new location in containing view
 	textFrame.origin.y = NSHeight(headerFrame) + kVerticalTextPadding;
-	textFrame.size.height = headerFrame.origin.y;
+	textFrame.size.height = textFrame.size.height - textFrame.origin.y;
 	
 	SPTextAndHeaderViewContainer *container = [[SPTextAndHeaderViewContainer alloc] 
 			initWithFrame:containerFrame];
@@ -125,7 +125,8 @@
 	container.textView = textView;
 	
 	// container.headerView = headerView;
-	// This call screws it up, unneeded by the container view anyway
+	// This call screws it up, unneeded by the container view anyway.
+	// Unsure why, as the headerView isn't referred to anywhere in the container
 	
 	[scrollView setDocumentView:container];
 	
