@@ -43,21 +43,16 @@
 
 //	Much of this code was pulled from online discussion groups in which users
 //	were exactly trying to solve the problem of embedding additional views inside
-//	a scroll view along with a text view. The code was incomplete and not entirely
-//	functional. A number of modifications were made to produce this working product.
+//	a scroll view along with a text view. The code was incomplete and not functional.
+//	A number of modifications were made to produce this working product.
 
-//
 //	The trick: having the correct autoresizing masks on the header view
-//	and on the text view...
+//	and on the text view:
 //	
-//	The header should be horizontally resizable, be sticky on the left 
-//	and right sides, and be sticky on the bottom.
-//
-//	The text view should be horizontally resizable and sticky on 
-//	the left and right sides as well as on the top.
-//
-//	This has been established in IB but could be accomplished in code as well.
-//
+//	The header should be horizontally resizable and sticky on the left, right and bottom.
+//	The text view should be horizontally resizable and sticky on the left, right and top.
+//	This has been established in IB but could be accomplished in code as well using
+//	autoresizing masks or new Lion APIs.
 
 #import "SPTextAndHeaderViewContainer.h"
 
@@ -98,7 +93,7 @@
 #pragma mark -
 
 
-- (void)resizeSubviewsWithOldSize:(NSSize)oldBoundsSize { //(PHIL)
+- (void)resizeSubviewsWithOldSize:(NSSize)oldBoundsSize {
 	
 	// set and check autosizing flag to prevent infinite recursive loop
 	if ( isAutosizing ) return;
@@ -116,15 +111,15 @@
 {
 	NSRect textFrame = [textView frame];
 	
-	// 110 height, 125 text origin (refactor)
-	
 	// I do want to maintain a minimum height as well
 	// trouble is if no backgrounds are being drawn, we need to clear out display artifacts
 	// from the end of the text frame to the end of our height
 	
-	CGFloat minHeight = [scrollViewAncestor contentSize].height - 20; // margin
+	// Do not recall why the 20 and 10 offsets.
 	
+	CGFloat minHeight = [scrollViewAncestor contentSize].height - 20; // margin
 	CGFloat desiredHeight = NSMaxY(textFrame) + 10; // margin
+	
 	if ( desiredHeight < minHeight ) desiredHeight = minHeight;
 	
 	if ( desiredHeight < [scrollViewAncestor contentSize].height ) {
@@ -152,14 +147,17 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	// probably we want to make the text view first responder and move
-	// the insertion point to the end
+	// In case the text view does not occupy the rest of the container view,
+	// we receive the click and redirect it to the text view by making the text 
+	// view the first responder and moving the insertion point to the end.
+	
+	// If the click takes place in the header area we ignore it.
 	
 	//NSInteger clickCount = [theEvent clickCount];
 	NSPoint winPoint = [theEvent locationInWindow];
 	NSPoint viewPoint = [self convertPointFromBase:winPoint];
 	
-	if ( [self mouse:viewPoint inRect:NSMakeRect(0,0,NSWidth([self bounds]),125)] ) // factor
+	if ( [self mouse:viewPoint inRect:NSMakeRect(0,0,NSWidth([self bounds]),NSMinY([textView frame]))] )
 		return;
 		
 	if ( [self.textView acceptsFirstResponder] ) { 

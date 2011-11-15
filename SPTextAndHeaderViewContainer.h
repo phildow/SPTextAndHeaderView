@@ -47,6 +47,11 @@
 //	You can put anything you want in the header view: images, text and token fields,
 //	whatever, and they will all show up above the main text view.
 
+//	ISSUES
+//	- incorrect text cursor when hovering mouse over header view
+//		- corrects itself when text view resizes because of text input
+//		- appears when resizing window
+
 #import <Cocoa/Cocoa.h>
 
 
